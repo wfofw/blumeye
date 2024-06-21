@@ -67,8 +67,8 @@ def is_bomb(contour, bomb_contours):
 # Функция для клика по найденной области
 def click_on_contour(contour, monitor):
     x, y, w, h = cv2.boundingRect(contour)
-    center_x = monitor['left'] + x + w // 2
-    center_y = monitor['top'] + y + h // 2
+    center_x = monitor['left'] + x + w / random.uniform(1.210, 1.999)
+    center_y = monitor['top'] + y + h / random.uniform(1.210, 1.999)
     pyautogui.click(center_x, center_y)
 
 # Функция для сохранения скриншотов
