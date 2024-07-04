@@ -15,7 +15,7 @@ os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
 stop_program = False
 
 # Создание пула потоков для параллельной обработки
-executor = ThreadPoolExecutor(max_workers=15)
+executor = ThreadPoolExecutor(max_workers=50)
 
 class StopProgramException(Exception):
     pass
@@ -34,7 +34,7 @@ def screen_capture(monitor):
 def apply_threshold(image):
     if stop_program:
         raise StopProgramException()
-    _, thresh = cv2.threshold(image, 99, 255, cv2.THRESH_BINARY)
+    _, thresh = cv2.threshold(image, 90, 255, cv2.THRESH_BINARY)
     return thresh
 
 # Функция для нахождения и упрощения контуров
@@ -103,7 +103,7 @@ def process_screenshot(monitor, random_click):
         if contours:
             contours = filter_straight_contours(contours)  # Фильтрация прямых контуров
             for contour in contours:
-                if 100 < cv2.contourArea(contour) < 10000:
+                if 305 < cv2.contourArea(contour) < 10000:
                     click_on_contour(contour, monitor)
                     click_fixed_point(*random_click)
                     vis_image = visualize_contours(capture_thresh, contours, contour)
@@ -135,11 +135,11 @@ async def main():
     futures = []
 
     while not stop_program:
-        fixed_click_point1 = (random.randint(387, 390) + random.randint(9, 174) // 2, random.randint(1019, 1025) + random.randint(1, 6) // 2)
-        fixed_click_point2 = (random.randint(1406, 1446) + random.randint(7, 50) // 2, random.randint(1019, 1025) + random.randint(1, 6) // 2)
+        fixed_click_point1 = (random.randint(387, 390) + random.randint(9, 170), random.randint(1019, 1025) + random.randint(1, 6))
+        fixed_click_point2 = (random.randint(1406, 1446) + random.randint(7, 50), random.randint(1019, 1025) + random.randint(1, 6))
 
-        random_click_left_side = (random.randint(11, 301) + random.randint(1, 10) // 2, random.randint(320, 750) + random.randint(11, 50) // 2) #random
-        random_click_right_side = (random.randint(1580, 1800) + random.randint(1, 12) // 2, random.randint(320, 750) + random.randint(11, 50) // 2) #random
+        random_click_left_side = (random.randint(11, 301) + random.randint(1, 10), random.randint(320, 750) + random.randint(11, 50)) #random
+        random_click_right_side = (random.randint(1580, 1800) + random.randint(1, 12), random.randint(320, 750) + random.randint(11, 50)) #random
 
         random_fixed_click_point = random.choice([
             fixed_click_point1,
@@ -152,7 +152,7 @@ async def main():
         future = executor.submit(process_screenshot, monitor, random_fixed_click_point)
         futures.append(future)
 
-        await asyncio.sleep(0.06)
+        await asyncio.sleep(0.04)
 
     # Принудительное завершение всех запущенных задач
     for future in futures:
