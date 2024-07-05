@@ -105,8 +105,8 @@ def process_screenshot(monitor):
                 random_countr = random.choice(contours)
                 if 300 < cv2.contourArea(random_countr) < 10000:
                     click_on_contour(random_countr, monitor)
-                    vis_image = visualize_contours(capture_thresh, contours, random_countr)
-                    save_screenshot(vis_image, prefix='matched')
+                    # vis_image = visualize_contours(capture_thresh, contours, random_countr)
+                    # save_screenshot(vis_image, prefix='matched')
                     break
     except StopProgramException:
         return
