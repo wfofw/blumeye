@@ -93,7 +93,7 @@ def on_press(key):
         return False  # Остановить слушатель
 
 # Функция для обработки скриншота
-def process_screenshot(monitor, random_click):
+def process_screenshot(monitor):
     if stop_program:
         return
     try:
@@ -105,7 +105,6 @@ def process_screenshot(monitor, random_click):
             for contour in contours:
                 if 305 < cv2.contourArea(contour) < 10000:
                     click_on_contour(contour, monitor)
-                    click_fixed_point(*random_click)
                     vis_image = visualize_contours(capture_thresh, contours, contour)
                     save_screenshot(vis_image, prefix='matched')
                     break
@@ -115,6 +114,16 @@ def process_screenshot(monitor, random_click):
 # Функция для клика по определенной точке
 def click_fixed_point(x, y):
     pyautogui.click(x, y)
+
+# Функция для рандомного клика
+async def random_click_task():
+    while not stop_program:
+        await asyncio.sleep(random.uniform(1.0001, 3.9992))
+        fixed_click_point1 = (random.randint(387, 390) + random.randint(9, 170), random.randint(1019, 1025) + random.randint(1, 6))
+        fixed_click_point2 = (random.randint(1406, 1446) + random.randint(7, 50), random.randint(1019, 1025) + random.randint(1, 6))
+
+        random_fixed_click_point = random.choice([fixed_click_point1, fixed_click_point2])
+        click_fixed_point(*random_fixed_click_point)
 
 # Главная асинхронная функция
 async def main():
@@ -134,25 +143,15 @@ async def main():
 
     futures = []
 
+    # Запуск задачи для рандомного клика
+    asyncio.create_task(random_click_task())
+
     while not stop_program:
-        fixed_click_point1 = (random.randint(387, 390) + random.randint(9, 170), random.randint(1019, 1025) + random.randint(1, 6))
-        fixed_click_point2 = (random.randint(1406, 1446) + random.randint(7, 50), random.randint(1019, 1025) + random.randint(1, 6))
-
-        random_click_left_side = (random.randint(11, 301) + random.randint(1, 10), random.randint(320, 750) + random.randint(11, 50)) #random
-        random_click_right_side = (random.randint(1580, 1800) + random.randint(1, 12), random.randint(320, 750) + random.randint(11, 50)) #random
-
-        random_fixed_click_point = random.choice([
-            fixed_click_point1,
-            random_click_left_side,
-            fixed_click_point2,
-            random_click_right_side
-        ])
-
         # Запуск задачи в отдельном потоке
-        future = executor.submit(process_screenshot, monitor, random_fixed_click_point)
+        future = executor.submit(process_screenshot, monitor)
         futures.append(future)
 
-        await asyncio.sleep(0.04)
+        await asyncio.sleep(0.041)
 
     # Принудительное завершение всех запущенных задач
     for future in futures:
