@@ -103,7 +103,7 @@ def process_screenshot(monitor):
         if contours:
             contours = filter_straight_contours(contours)  # Фильтрация прямых контуров
             for contour in contours:
-                if 305 < cv2.contourArea(contour) < 10000:
+                if 380 < cv2.contourArea(contour) < 10000:
                     click_on_contour(contour, monitor)
                     vis_image = visualize_contours(capture_thresh, contours, contour)
                     save_screenshot(vis_image, prefix='matched')
