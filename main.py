@@ -88,9 +88,8 @@ def visualize_contours(image, contours, matched_contour=None):
 # Обработчик нажатия клавиш для остановки программы
 def on_press(key):
     global stop_program
-    if hasattr(key, 'char') and key.char == 'q':
-        stop_program = True
-        return False  # Остановить слушатель
+    stop_program = True
+    return False  # Остановить слушатель
 
 # Функция для обработки скриншота
 def process_screenshot(monitor):
@@ -103,7 +102,7 @@ def process_screenshot(monitor):
         if contours:
             contours = filter_straight_contours(contours)  # Фильтрация прямых контуров
             for contour in contours:
-                if 380 < cv2.contourArea(contour) < 10000:
+                if 461 < cv2.contourArea(contour) < 10000:
                     click_on_contour(contour, monitor)
                     vis_image = visualize_contours(capture_thresh, contours, contour)
                     save_screenshot(vis_image, prefix='matched')
