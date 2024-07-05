@@ -101,10 +101,11 @@ def process_screenshot(monitor):
         contours = find_and_simplify_contours(capture_thresh)
         if contours:
             contours = filter_straight_contours(contours)  # Фильтрация прямых контуров
-            for contour in contours:
-                if 461 < cv2.contourArea(contour) < 10000:
-                    click_on_contour(contour, monitor)
-                    vis_image = visualize_contours(capture_thresh, contours, contour)
+            for i in range(len(contours)):
+                random_countr = random.choice(contours)
+                if 300 < cv2.contourArea(random_countr) < 10000:
+                    click_on_contour(random_countr, monitor)
+                    vis_image = visualize_contours(capture_thresh, contours, random_countr)
                     save_screenshot(vis_image, prefix='matched')
                     break
     except StopProgramException:
@@ -150,7 +151,7 @@ async def main():
         future = executor.submit(process_screenshot, monitor)
         futures.append(future)
 
-        await asyncio.sleep(0.041)
+        await asyncio.sleep(0.075)
 
     # Принудительное завершение всех запущенных задач
     for future in futures:
