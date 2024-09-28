@@ -107,8 +107,28 @@ async def stop_listener():
 def click_fixed_point(x, y):
     pyautogui.click(x, y)
 
+def back_to_menu():
+    pyautogui.click(100, 130)
+    time.sleep(5)
+
+def start_button():
+    pyautogui.moveTo(1700, 800)
+    pyautogui.mouseDown()
+    time.sleep(0.5)
+    pyautogui.moveTo(1600, 0)
+    pyautogui.mouseUp
+
+async def perform_intermediate_task():
+    if not stop_program:
+        print("Ебашим в лобби и запуск")
+        back_to_menu()
+        start_button()
+        start_button()
+        start_button()
+
 async def run_main_for_duration(main_task_duration, pause_duration):
     global stop_program
+
     while not stop_program:
         # Запуск main() на 45 секунд
         print("Запуск main() на 45 секунд")
@@ -124,8 +144,19 @@ async def run_main_for_duration(main_task_duration, pause_duration):
         if not stop_program:
             print(f"Пауза {pause_duration} секунд перед следующим запуском...")
             await asyncio.sleep(pause_duration)
-        else:
-            break
+
+        if not stop_program:
+            print(f"Пауза {pause_duration} секунд перед следующим запуском...")
+
+            # Запуск промежуточной задачи во время паузы
+            intermediate_task = asyncio.create_task(perform_intermediate_task())
+
+            # Ожидание перед следующим циклом
+            await asyncio.sleep(pause_duration)
+
+            # Остановка промежуточной задачи после паузы
+            intermediate_task.cancel()
+    
     cv2.destroyAllWindows()
 
 # Главная асинхронная функция
@@ -172,8 +203,8 @@ async def main():
         fixed_click_left_side = (random.randint(404, 533), random.randint(984, 985)) # first - x, second - y
         fixed_click_right_side = (random.randint(1377, 1493), random.randint(984, 985)) # first - x, second - y
 
-        random_click_left_side = (random.randint(80, 230), random.randint(236, 500))
-        random_click_right_side = (random.randint(1740, 1804), random.randint(236, 501))
+        # random_click_left_side = (random.randint(80, 230), random.randint(236, 500))
+        # random_click_right_side = (random.randint(1740, 1804), random.randint(236, 501))
 
         random_fixed_click_point = random.choice([
             fixed_click_left_side,
@@ -201,10 +232,11 @@ async def main():
                 # Сохранение скриншота без совпадений
                 # vis_image = visualize_contours(capture_thresh, contours, None, bomb_contours)
                 # save_screenshot(vis_image, prefix='screen')
-                time.sleep(random.uniform(0.1, 0.11))
+                # time.sleep(random.uniform(0.1, 0.11))
         else:
             click_fixed_point(*random_fixed_click_point)
             await asyncio.sleep(random.uniform(1, 1.5))
+        cv2.destroyAllWindows()
 
 async def main_loop():
     # Запускаем одновременно основной процесс и слушатель нажатий
