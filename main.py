@@ -95,14 +95,41 @@ def on_press(key):
     stop_program = True
     return False  # Остановить слушатель и закончить программу
 
+async def stop_listener():
+    # Запускаем слушателя клавиатуры в фоновом режиме
+    listener = keyboard.Listener(on_press=on_press)
+    listener.start()
+    while not stop_program:
+        await asyncio.sleep(0.1)  # Легкая пауза для фона, чтобы не блокировать основной цикл
+    listener.stop()
+
 # Функция для клика по определенной точке
 def click_fixed_point(x, y):
     pyautogui.click(x, y)
 
+async def run_main_for_duration(main_task_duration, pause_duration):
+    global stop_program
+    while not stop_program:
+        # Запуск main() на 45 секунд
+        print("Запуск main() на 45 секунд")
+        task = asyncio.create_task(main())
+        
+        try:
+            await asyncio.wait_for(task, timeout=main_task_duration)
+        except asyncio.TimeoutError:
+            task.cancel()
+            print("main() завершена по таймеру")
+
+        # Пауза перед следующим запускомвы
+        if not stop_program:
+            print(f"Пауза {pause_duration} секунд перед следующим запуском...")
+            await asyncio.sleep(pause_duration)
+        else:
+            break
+    cv2.destroyAllWindows()
+
 # Главная асинхронная функция
 async def main():
-    global stop_program
-
     # Загрузка эталонных изображений бомб и нахождение их контуров
     bomb_dir = './bombEtalon/'
     bomb_contours = []
@@ -140,8 +167,6 @@ async def main():
     }
 
     # Запуск слушателя для нажатий клавиш
-    listener = keyboard.Listener(on_press=on_press)
-    listener.start()
 
     while not stop_program:
         fixed_click_left_side = (random.randint(404, 533), random.randint(984, 985)) # first - x, second - y
@@ -180,7 +205,13 @@ async def main():
         else:
             click_fixed_point(*random_fixed_click_point)
             await asyncio.sleep(random.uniform(1, 1.5))
-    cv2.destroyAllWindows()
+
+async def main_loop():
+    # Запускаем одновременно основной процесс и слушатель нажатий
+    await asyncio.gather(
+        run_main_for_duration(main_task_duration=45, pause_duration=15),
+        stop_listener()
+    )
 
 if __name__ == '__main__':
-    asyncio.run(main())
+    asyncio.run(main_loop())
